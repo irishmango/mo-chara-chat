@@ -3,12 +3,16 @@ import styled from "styled-components";
 import Robot from "../assets/robot.gif";
 export default function Welcome() {
   const [userName, setUserName] = useState("");
-  useEffect(async () => {
-    setUserName(
-      await JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-      ).username
-    );
+  useEffect(() => {
+    const key = import.meta.env.VITE_LOCALHOST_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (!stored) return;
+      const data = JSON.parse(stored);
+      setUserName(data?.username ?? "");
+    } catch (err) {
+      console.error("Invalid user data in localStorage", err);
+    }
   }, []);
   return (
     <Container>

@@ -6,12 +6,17 @@ export default function Contacts({ contacts, changeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
-  useEffect(async () => {
-    const data = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-    );
-    setCurrentUserName(data.username);
-    setCurrentUserImage(data.avatarImage);
+  useEffect(() => {
+    const key = import.meta.env.VITE_LOCALHOST_KEY;
+    const stored = localStorage.getItem(key);
+    if (!stored) return;
+    try {
+      const data = JSON.parse(stored);
+      setCurrentUserName(data.username);
+      setCurrentUserImage(data.avatarImage);
+    } catch (err) {
+      console.error("Invalid user data in localStorage", err);
+    }
   }, []);
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
@@ -19,7 +24,7 @@ export default function Contacts({ contacts, changeChat }) {
   };
   return (
     <>
-      {currentUserImage && currentUserImage && (
+      {currentUserImage && currentUserName && (
         <Container>
           <div className="brand">
             <img src={Logo} alt="logo" />
@@ -30,9 +35,8 @@ export default function Contacts({ contacts, changeChat }) {
               return (
                 <div
                   key={contact._id}
-                  className={`contact ${
-                    index === currentSelected ? "selected" : ""
-                  }`}
+                  className={`contact ${index === currentSelected ? "selected" : ""
+                    }`}
                   onClick={() => changeCurrentChat(index, contact)}
                 >
                   <div className="avatar">
