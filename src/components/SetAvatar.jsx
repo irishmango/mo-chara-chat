@@ -23,7 +23,7 @@ export default function SetAvatar() {
   };
 
   useEffect(() => {
-    const user = localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY);
+    const user = localStorage.getItem(import.meta.env.VITE_LOCALHOST_KEY);
     if (!user) navigate("/login");
   }, [navigate]);
 
@@ -51,24 +51,29 @@ export default function SetAvatar() {
       return;
     }
 
-    const user = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    const user = JSON.parse(
+      localStorage.getItem(import.meta.env.VITE_LOCALHOST_KEY)
     );
 
-    const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
-      image: avatars[selectedAvatar],
-    });
+    try {
+      const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
+        image: avatars[selectedAvatar],
+      });
 
-    if (data.isSet) {
-      user.isAvatarImageSet = true;
-      user.avatarImage = data.image;
-      localStorage.setItem(
-        process.env.REACT_APP_LOCALHOST_KEY,
-        JSON.stringify(user)
-      );
-      navigate("/");
-    } else {
-      toast.error("Error setting avatar. Please try again.", toastOptions);
+      if (data.isSet) {
+        user.isAvatarImageSet = true;
+        user.avatarImage = data.image;
+        localStorage.setItem(
+          import.meta.env.VITE_LOCALHOST_KEY,
+          JSON.stringify(user)
+        );
+        navigate("/");
+      } else {
+        toast.error("Error setting avatar. Please try again.", toastOptions);
+      }
+    } catch (err) {
+      console.error("Failed to set avatar", err);
+      toast.error("Failed to set avatar. Please try again.", toastOptions);
     }
   };
 
@@ -87,9 +92,8 @@ export default function SetAvatar() {
             {avatars.map((avatar, index) => (
               <div
                 key={index}
-                className={`avatar ${
-                  selectedAvatar === index ? "selected" : ""
-                }`}
+                className={`avatar ${selectedAvatar === index ? "selected" : ""
+                  }`}
                 onClick={() => setSelectedAvatar(index)}
               >
                 <img

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/chat_logo_trans.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { registerRoute } from "../utils/APIRoutes";
@@ -24,10 +24,10 @@ export default function Register() {
   });
 
   useEffect(() => {
-    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
+    if (localStorage.getItem(import.meta.env.VITE_LOCALHOST_KEY)) {
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -64,22 +64,29 @@ export default function Register() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (handleValidation()) {
-      const { email, username, password } = values;
-      const { data } = await axios.post(registerRoute, {
-        username,
-        email,
-        password,
-      });
+      try {
+        const { email, username, password } = values;
+        const { data } = await axios.post(registerRoute, {
+          username,
+          email,
+          password,
+        });
 
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
-      }
-      if (data.status === true) {
-        localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
-          JSON.stringify(data.user)
-        );
-        navigate("/");
+        if (data.status === false) {
+          toast.error(data.msg, toastOptions);
+          return;
+        }
+
+        if (data.status === true) {
+          localStorage.setItem(
+            import.meta.env.VITE_LOCALHOST_KEY,
+            JSON.stringify(data.user)
+          );
+          navigate("/");
+        }
+      } catch (err) {
+        console.error("Registration failed", err);
+        toast.error("Registration failed. Please try again.", toastOptions);
       }
     }
   };
@@ -90,13 +97,14 @@ export default function Register() {
         <form action="" onSubmit={(event) => handleSubmit(event)}>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h1>snappy</h1>
+            <h1>Mo Chara</h1>
           </div>
           <input
             type="text"
             placeholder="Username"
             name="username"
             onChange={(e) => handleChange(e)}
+            minLength={3}
           />
           <input
             type="email"
@@ -135,14 +143,14 @@ const FormContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   align-items: center;
-  background-color: #131324;
+  background-color: #021609ff;
   .brand {
     display: flex;
     align-items: center;
     gap: 1rem;
     justify-content: center;
     img {
-      height: 5rem;
+      height: 10rem;
     }
     h1 {
       color: white;
@@ -154,25 +162,25 @@ const FormContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background-color: #00000076;
+    background-color: #062611ff;
     border-radius: 2rem;
-    padding: 3rem 5rem;
+    padding: 5rem;
   }
   input {
     background-color: transparent;
     padding: 1rem;
-    border: 0.1rem solid #4e0eff;
+    border: 0.15rem solid #315e41ff;
     border-radius: 0.4rem;
     color: white;
     width: 100%;
     font-size: 1rem;
     &:focus {
-      border: 0.1rem solid #997af0;
+      border: 0.18rem solid #6b7f72ff;
       outline: none;
     }
   }
   button {
-    background-color: #4e0eff;
+    background-color: #05411aff;
     color: white;
     padding: 1rem 2rem;
     border: none;
@@ -182,14 +190,14 @@ const FormContainer = styled.div`
     font-size: 1rem;
     text-transform: uppercase;
     &:hover {
-      background-color: #4e0eff;
+      background-color: #117534ff;
     }
   }
   span {
     color: white;
     text-transform: uppercase;
     a {
-      color: #4e0eff;
+      color: #315e41ff;
       text-decoration: none;
       font-weight: bold;
     }
